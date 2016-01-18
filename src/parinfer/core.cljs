@@ -24,8 +24,8 @@
        :cursorLine (:cursor-line option)
        :cursorDx (:cursor-dx option)})
 
-(def indent-mode* js/window.parinfer.indentMode)
-(def paren-mode* js/window.parinfer.parenMode)
+(def indent-mode* js/parinfer.indentMode)
+(def paren-mode* js/parinfer.parenMode)
 
 (defn indent-mode
   ([text] (convert-result (indent-mode* text)))
