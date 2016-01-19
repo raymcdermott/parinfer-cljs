@@ -14,7 +14,7 @@ clojure maps.  All names are converted from `camelCase` to `kebab-case`.
 ```clj
 (ns your-ns
   (:require
-    [parinfer.core :refer [indent-mode paren-mode]]))
+    [parinfer-cljs.core :refer [indent-mode paren-mode]]))
 
 (println (:text (indent-mode "(foo\nbar)")))
 (println (:text (paren-mode "(foo\nbar)")))
