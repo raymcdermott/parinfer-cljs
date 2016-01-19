@@ -1,4 +1,4 @@
-(ns parinfer.core
+(ns parinfer-cljs.core
   (:require
     cljsjs.parinfer))
 

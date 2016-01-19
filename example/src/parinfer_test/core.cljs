@@ -1,6 +1,6 @@
 (ns parinfer-test.core
   (:require
-    [parinfer.core :refer [indent-mode paren-mode]]))
+    [parinfer-cljs.core :refer [indent-mode paren-mode]]))
 
 (enable-console-print!)
 

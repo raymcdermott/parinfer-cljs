@@ -1,4 +1,4 @@
-(defproject parinfer "1.4.0-0"
+(defproject parinfer-cljs "1.4.0-0"
   :description "Simpler Lisp Editing"
   :url "https://github.com/shaunlebron/parinfer-cljs"
   :dependencies [[org.clojure/clojure "1.7.0"]
