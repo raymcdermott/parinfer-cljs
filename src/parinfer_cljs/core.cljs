@@ -1,6 +1,6 @@
 (ns parinfer-cljs.core
   (:require
-    cljsjs.parinfer))
+    [cljsjs.parinfer]))
 
 (defn- convert-changed-line [e]
   {:line-no (aget e "lineNo")

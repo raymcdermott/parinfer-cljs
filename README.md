@@ -5,7 +5,7 @@ A idiomatic ClojureScript wrapper for [parinfer.js].
 Lein dependency:
 
 ```clj
-[parinfer-cljs "1.4.0-1"]
+[parinfer-cljs "1.5.1-0"]
 ```
 
 For usage, see [API for parinfer.js].  JavaScript objects are replaced with
