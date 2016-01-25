@@ -1,3 +1,5 @@
+__NOTE__: This doesn't work for Node yet.  Need to resolve [boot-cljsjs issue #29](https://github.com/cljsjs/boot-cljsjs/issues/29)
+
 # Parinfer for ClojureScript
 
 A idiomatic ClojureScript wrapper for [parinfer.js].
