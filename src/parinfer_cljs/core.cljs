@@ -4,40 +4,49 @@
 (defn convert-result
   "Convert the results of parinfer JS to idiomatic kebab-style Clojure maps."
   [result x-map]
-  (into {} (map (fn [[k v]]
-                  (cond
-                    (= :name k) (when-let [from-js (aget result (name k))]
-                                  [k (get v from-js)])
-                    (keyword? v) (when-let [from-js (aget result (name k))]
-                                   [v from-js])
+  (let [res (into {} (map (fn [[k v]]
+                            (cond
+                              (= :name k)
+                              (when-let [from-js (aget result (name k))]
+                                [k (get v from-js)])
 
-                    (map? v) (when-let [from-js (aget result (name k))]
-                               [k (convert-result from-js v)])
+                              (keyword? v)
+                              (when-let [from-js (aget result (name k))]
+                                [v from-js])
 
-                    (coll? v) (when-let [from-js (aget result (name k))]
+                              (map? v)
+                              (when-let [from-js (aget result (name k))]
+                                [k (convert-result from-js v)])
+
+                              (coll? v)
+                              (when-let [from-js (aget result (name k))]
                                 (let [result (if (= (type from-js) js/Object)
                                                (convert-result from-js (last v))
                                                (mapv #(convert-result % (last v)) from-js))]
                                   [(first v) result]))))
-                x-map)))
+                          x-map))]
+    ;    (println "convert-result ->" res)
+    res))
 
 (defn- convert-options
   "Convert a map of options expressed with idiomatic CLJS kebab keywords to a JS object."
   [options mapping]
-  (js-obj (into {} (map (fn [[k v]]
-                          (when-let [mapping (k mapping)]
-                            [mapping v])) options))))
+  (clj->js
+    (into {} (map (fn [[k v]]
+                    (when-let [map-val (k mapping)]
+                      [map-val v]))
+                  options))))
 
 ;; Options mappings as of 3.x
 (def ^:private cljs->js-options-map
-  {:cursor-line          :cursorLine
-   :cursor-x             :cursorX
-   :prev-cursor-line     :prevCursorLine
-   :prev-cursor-x        :prevCursorX
-   :selection-start-line :selectionStartLine
-   :changes              :changes
-   :force-balance        :forceBalance
-   :partial-result       :partialResult})
+  {:cursor-line          "cursorLine"
+   :cursor-x             "cursorX"
+   :prev-cursor-line     "prevCursorLine"
+   :prev-cursor-x        "prevCursorX"
+   :selection-start-line "selectionStartLine"
+   :changes              "changes"
+   :force-balance        "forceBalance"
+   :partial-result       "partialResult"})
 
 ;; Output mappings as of 3.x
 (def ^:private js->cljs-extra

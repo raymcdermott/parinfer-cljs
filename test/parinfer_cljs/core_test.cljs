@@ -130,28 +130,43 @@
   (testing "smart-mode"
     (is (= align-result (parinfer/smart-mode "(let \n[x 1 \ny 2]\n(+ x y))")))))
 
+(def cursor-pos-result
+  {:success true
+   :text "(+ 1 2)"
+   :cursor-x 5
+   :cursor-line 0
+   :paren-trails [{:line-no 0 :start-x 6 :end-x 7}]})
+
 (def cursor-pos-options {:cursor-x 5 :cursor-line 0})
 
 (deftest happy-path-cursor-options
   (testing "indent-mode"
-    (is (= indent-result (parinfer/indent-mode "(+ 1 2)" cursor-pos-options))))
+    (is (= cursor-pos-result (parinfer/indent-mode "(+ 1 2)" cursor-pos-options))))
 
   (testing "paren-mode"
-    (is (= indent-result (parinfer/paren-mode "(+ 1 2)" cursor-pos-options))))
+    (is (= cursor-pos-result (parinfer/paren-mode "(+ 1 2)" cursor-pos-options))))
 
   (testing "smart-mode"
-    (is (= indent-result (parinfer/smart-mode "(+ 1 2)" cursor-pos-options)))))
+    (is (= cursor-pos-result (parinfer/smart-mode "(+ 1 2)" cursor-pos-options)))))
 
 
 (def cursor-nl-pos-result
-  {:success      true
-   :text         "(let [x 1]) \n(+ x 2)"
+  {:success true
+   :text "(let [x 1]) \n(+ x 2)"
+   :cursor-x 5
+   :cursor-line 1
+   :tab-stops [{:x 0 :line-no 0 :ch "("}
+               {:x 5 :arg-x 8 :line-no 0 :ch "["}]
    :paren-trails [{:line-no 0 :start-x 9 :end-x 11}
                   {:line-no 1 :start-x 6 :end-x 7}]})
 
 (def cursor-nl-pos-result-paren-mode
-  {:success      true
-   :text         "(let [x 1] \n (+ x 2))"
+  {:success true
+   :text "(let [x 1] \n (+ x 2))"
+   :cursor-x 6
+   :cursor-line 1
+   :tab-stops [{:x 0 :line-no 0 :ch "("}
+               {:x 5 :arg-x 8 :line-no 0 :ch "["}]
    :paren-trails [{:line-no 0 :start-x 9 :end-x 10}
                   {:line-no 1 :start-x 7 :end-x 9}]})
 
@@ -174,6 +189,11 @@
 (def fix-paren {:text  "(def foo [a b"
                 :error {:name :unclosed-paren :message "Unclosed open-paren." :line-no 0 :x 9}})
 
+(def partial-result {:success      true
+                     :text         "(let [x 1]\n (+ x 2))"
+                     :paren-trails [{:line-no 0 :start-x 9 :end-x 10}
+                                    {:line-no 1 :start-x 7 :end-x 9}]})
+
 (deftest happy-path-fix-unmatched
   (testing "indent-mode"
     (is (= fix-result (parinfer/indent-mode "(def foo [a b"))))
@@ -182,4 +202,39 @@
     (is (= fix-paren (parinfer/paren-mode "(def foo [a b"))))
 
   (testing "smart-mode"
-    (is (= fix-result (parinfer/smart-mode "(def foo [a b")))))
+    (is (= fix-result (parinfer/smart-mode "(def foo [a b"))))
+
+  (testing "partial paren-mode"
+    (is (= partial-result (parinfer/paren-mode "(let [x 1]\n(+ x 2))" {:partial-result true})))))
+
+
+
+(def cursor-before-fixed-result
+  {:success      true
+   :text         "(def foo [a b])"
+   :cursor-x     0
+   :cursor-line  0
+   :paren-trails [{:line-no 0, :start-x 13, :end-x 15}]})
+
+(def cursor-before-fixed-paren
+  {:text "(def foo [a b"
+   :cursor-x 0
+   :cursor-line 0
+   :error {:name :unclosed-paren
+           :message "Unclosed open-paren."
+           :line-no 0
+           :x 9}})
+
+(def cursor-before-fixed-options {:cursor-x 0 :cursor-line 0})
+
+(deftest happy-path-fix-unmatched-options
+  (testing "indent-mode"
+    (is (= cursor-before-fixed-result (parinfer/indent-mode "(def foo [a b" cursor-before-fixed-options))))
+
+  (testing "paren-mode"
+    (is (= cursor-before-fixed-paren (parinfer/paren-mode "(def foo [a b" cursor-before-fixed-options))))
+
+  (testing "smart-mode"
+    (is (= cursor-before-fixed-result
+          (parinfer/smart-mode "(def foo [a b" cursor-before-fixed-options)))))
+
